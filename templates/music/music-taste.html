@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+<body>
+{% block title %}
+    OO音乐-最懂你的音乐品味海量优质乐库新歌热歌随心听的音乐平台！
+{% endblock title %}
+{% block content %}
+    <section class="main_slider_area" style="background: url(../../media/img/banner/banner-bg.png) no-repeat scroll right top">
+        <div class="container">
+            <div class="banner_inner_text">
+                <h2>听歌品味</h2>
+            <p>根据您的播放记录为您生成您的专属听歌品味</p>
+            </div>
+        {% if img_urls %}
+            <div style="text-align:center">
+            <h2>歌曲偏好</h2>
+                <br>
+            <img alt="" src="{{ img_urls.0 }}" width="500px" height="400px">
+            <h2>歌手偏好</h2>
+                <br>
+            <img alt="" src="{{ img_urls.1 }}" width="500px" height="400px">
+            <h2>流派偏好</h2>
+                <br>
+            <img alt="" src="{{ img_urls.2 }}" width="500px" height="400px">
+        </div>
+        {% else %}
+            <h2>{{ error }}</h2>
+        {% endif %}
+
+        </div>
+    </section>
+{% endblock %}

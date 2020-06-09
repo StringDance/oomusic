@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+    <body>
+    {% block title %}
+    OO音乐-最懂你的音乐品味海量优质乐库新歌热歌随心听的音乐平台！
+    {% endblock title %}
+    {% block content %}
+
+        <section class="main_slider_area" style="background: url(../../media/img/banner/banner-bg.png) no-repeat scroll right top">
+            <div class="container">
+                <div class="banner_inner_text">
+                    <h2>歌手详情</h2>、
+                    <br><br>
+                </div>
+            </div>
+        </section>
+
+        <section class="service_feature">
+            <div class="container">
+                <div>
+                    <h1 class="display-4">
+                        <img src="{{ singer.avatar.url }}"
+                             class="img-fluid"
+                             alt="Responsive image"
+                             style="border-radius: 50%; width: 100px">
+                        {{ singer.name }}
+                        <small style="font-size: initial">
+                            <!--歌手标签,注意singer.tag后加 all才能迭代-->
+                            {% for t in singer.tag.all %}
+                                <a class="badge badge-success" href="#">
+                                    {{ t }}
+                                </a>
+                            {% endfor %}
+                        </small>
+                        <!--若用户已登录，显示喜欢和不喜欢(拉黑)按钮-->
+                        {% if user.is_authenticated %}
+                            <small style="float: right">
+                                <form style="display: inline-block;"
+                                      id="follow"
+                                      action="{% url 'music:follow' singer.id %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <!--注意，按钮的背景色要和 jumbotron 巨幕的背景色相同-->
+                                    <button type="submit"
+                                            style="border-style: none;background-color: lightsteelblue"
+                                            class="btn">
+                                        <i class="fa fa-heart" style="color: orangered"></i>
+                                        喜欢
+                                    </button>
+                                </form>
+                                <form style="display: inline-block;"
+                                      id="blacklist"
+                                      action="{% url 'music:blacklist' singer.id %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="btn"
+                                            style="border-style: none;background-color: lightsteelblue">
+                                        <i class="fa fa-heart"></i>
+                                        拉黑
+                                    </button>
+                                </form>
+                            </small>
+                        {% else %}
+                            <div style="display: inline-block;float: right">
+                                <button class="layui-btn  layui-btn-radius layui-btn-disabled" onmouseover="showTips()">喜欢</button>
+                                <button class="layui-btn layui-btn-radius layui-btn-disabled" onmouseover="showTips()">不喜欢</button>
+                            </div>
+                        {% endif %}
+                    </h1>
+                    <hr class="my-sm-4">
+                    <p class="lead">{{ singer.bio }}</p>
+                    <hr class="my-4">
+                    <div class="container" style="text-align: center">
+                        <div>
+                            <h3>{{ singer.name }}的歌曲</h3>
+                            <ul class="list-group list-group-horizontal-sm" style="text-align: center;">
+                                {% for song in music %}
+                                    <li class="list-group-item">
+                                        <a href="{% url 'music:music_detail' song.id%}" >
+                                            {{ song.name }}
+                                        </a>
+                                        ———
+                                        <a href="{% url 'music:album_detail' song.album_id %}">
+                                            {{ song.album.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div style="text-align: center">
+                            <h3>
+                                {{ singer.name }}的专辑
+                            </h3>
+                            {% for album in albums %}
+                                <img src="{{ album.album_cover.url }}"
+                                     style="border-radius: 25%;
+                                 width: 100px;
+                                 display: inline-block"
+                                     class="col-md-4">
+                                <a href="{% url 'music:album_detail' album.id %}" >
+                                    {{ album.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endblock content%}
+    </body>
+    {% block script %}
+<script>
+    function showTips() {
+        layer.msg('您需要先登录！');
+    }
+</script>
+{% endblock script %}
+</html>

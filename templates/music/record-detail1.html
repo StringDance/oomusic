@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<body>
+{% block title %}
+    OO音乐-最懂你的音乐品味海量优质乐库新歌热歌随心听的音乐平台！
+{% endblock title %}
+{% block content %}
+    <section class="main_slider_area" style="background: url(../../media/img/banner/banner-bg.png) no-repeat scroll right top">
+        <div class="container">
+            <div class="banner_inner_text">
+                <h2>播放记录</h2>
+                <p>您的最近30条播放记录都在这里<br></p>
+                <p><label class="font-weight-bold">
+                    您当前总共听歌<
+                    {% for record in user_record %}
+                        {% if forloop.counter == 1 %}
+                            {{ record.total_views }}
+                        {% endif %}
+                    {% endfor %}
+                    >次
+                </label>
+                </p>
+            </div>
+        </div>
+    </section>
+    <!--================Banner Area =================-->
+    <section class="service_feature">
+        <div class="container">
+            <!--循环一次的原因：total_views是模型上定义的"row level"属性，因此必须要用一个字段获取这个属性的值，所以只需循环一次-->
+            <!--还要增加一个显示用户听了多少首歌的功能,解决：在models中写相应方法，然而遇到了麻烦...-->
+            <div style="text-align: center">
+                {% if user_record.all.count == 0 %}
+                    <br><br><br><br>
+                    <h1>您当前暂无播放记录</h1>
+                    <br><br><br><br><br><br><br><br>
+                {% else %}
+                    <br>
+            </div>
+                    <div class="col-auto" style="text-align: center">
+                        <table class="table table-active table-hover">
+                            <tr>
+                                <td></td>
+                                <td>歌曲</td>
+                                <td>播放时间</td>
+                                <!--显然，对于同一首歌曲有多个播放记录的情况，歌曲播放次数数据冗余了-->
+                                <!--解决办法，在views.record_detail中将同一首歌的播放记录去掉重复的歌曲-->
+                                <td>当前歌曲播放总次数</td>
+                            </tr>
+                            {% for record in user_record %}
+                                <tr><td>{{ forloop.counter }}</td>
+                                    <td>{{ record.music }}</td>
+                                    <td>{{ record.time }}</td>
+                                    <td>{{ record.music_views }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div></div>
+                {% endif %}
+        <br><br><br><br><br>
+    <div>
+        {% for url in img_urls %}
+            <img alt="" src="{{ url }}">
+        {% endfor %}
+    </div>
+    </section>
+{% endblock content%}
+</body>
+</html>

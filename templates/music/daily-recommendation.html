@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    OO音乐-最懂你的音乐品味海量优质乐库新歌热歌随心听的音乐平台！
+{% endblock title %}
+{% block content %}
+
+<div class="col-lg-12">
+<div class="jumbotron">
+        <h1 class="display-4">
+                <br>
+            <i class="fa fa-heart-o" style="color: red"></i>您的今日推荐
+        </h1>
+        <h3 style="display: inline-block">我们根据您的喜好及播放记录为您推荐下列歌曲</h3>
+        <p id="time" style="display: inline-block;float: right;color:black"></p>
+        <i class="fa fa-clock-o fa-2x" style="float: right;color:lightseagreen"></i>
+<table class="table table-hover">
+    <tr>
+        <td>序号</td>
+        <td>歌曲</td>
+        <td>歌手</td>
+        <td>专辑</td>
+        <td></td>
+    </tr>
+    {% for song in list %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+                <a href="{% url 'music:music_detail' song.id %}">{{ song.name }}</a>
+            </td>
+            <td>
+                <a href="{% url 'music:singer_detail' song.singer_id %}">{{ song.singer }}</a>
+            </td>
+            <td>
+                <a href="{% url 'music:album_detail' song.album_id %}">{{ song.album }}</a>
+            </td>
+            <td>
+                <form
+                        style="display: inline-block"
+                        id="music_play2"
+                        action="{% url 'music:music_play2' song.id %}"
+                        method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">播放</button>
+                </form>
+            </td>
+
+        </tr>
+    {% endfor %}
+</table>
+</div>
+<!--================Service Solution Area =================-->
+        <section class="service_solution_area p_100">
+            <div class="container">
+                <div class="row s_solution_inner">
+                    <div class="col-lg-6">
+                        <div class="s_solution_item">
+                            <div class="l_title">
+                                <i class="fa fa-question-circle-o fa-5x" style="color: orangered"></i>
+                                <h2>FAQ</h2>
+                                <h6>每日推荐常见问题解答</h6>
+                            </div>
+                            <div id="accordion" role="tablist" class="solution_collaps">
+                                <div class="card">
+                                    <div class="card-header" role="tab" id="headingOne">
+                                        <h5 class="mb-0">
+                                            <a data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            每日歌曲推荐的依据是什么？
+                                            <i class="minus">-</i>
+                                            <i class="plus">+</i>
+                                            </a>
+                                        </h5>
+                                    </div>
+
+                                    <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <p>OO音乐独创的推荐算法会根据你的听歌口味进行推荐，而听歌口味综合了您的所填的偏好信息和播放记录等多种因素得到的结果，经过强大而又复杂的计算之后推荐出来的！</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header" role="tab" id="headingTwo">
+                                        <h5 class="mb-0">
+                                            <a class="collapsed" data-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                            推荐的歌曲或歌手不喜欢怎么办？
+                                            <i class="minus">-</i>
+                                            <i class="plus">+</i>
+                                            </a>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <p>如果系统给您推荐了你不喜欢的歌曲或歌手，您可以进入歌曲或歌手详情将其添加到黑名单中，系统将不再为您推荐此歌曲或此歌手的歌曲。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header" role="tab" id="headingThree">
+                                        <h5 class="mb-0">
+                                            <a class="collapsed" data-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            为什么点击【今日推荐】，系统不给我推荐歌曲？
+                                            <i class="minus">-</i>
+                                            <i class="plus">+</i>
+                                            </a>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <p>您需要在【偏好】中填写您喜欢、不喜欢的歌曲类型和喜欢的歌手的信息。 或者当您的歌曲播放总次数达到50时，系统才会给您推荐。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="col-lg-6" style="background: url(/media/img/3d-shap.png) no-repeat right"></div>
+                </div>
+            </div>
+        </section>
+        <!--================End Service Solution Area =================--></div>
+<script>
+    var date = new Date();
+    var y = date.getFullYear();
+    var m = date.getMonth()+1;
+    var d = date.getDate();
+    document.getElementById('time').innerHTML = y +'年'+m + '月' + d + '日';
+
+</script>
+{% endblock %}
+

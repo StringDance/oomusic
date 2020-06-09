@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% block title %}
+    专辑详情
+{% endblock %}
+<br><br>
+<br><br>
+{% block content %}
+    <section class="main_slider_area" style="background: url(../../media/img/banner/banner-bg.png) no-repeat scroll right top">
+            <div class="container">
+                <div class="banner_inner_text">
+                    <h2>专辑详情</h2>
+                    <br><br>
+                </div>
+            </div>
+        </section>
+    <section class="service_feature">
+<div class="container">
+    {% if album_details.name == '未知专辑' %}
+        <br>
+        <div align="center">
+            <p style="color: red ; font-family: 黑体,serif ; font-size: xx-large">专辑信息待完善</p>
+            <a href="{% url 'music:music_list' %}">返回首页</a>
+        </div>
+    {% else %}
+        <div class="jumbotron" >
+        <h1 class="display-4">
+            <img src="{{ album_details.album_cover.url }}"
+                 class="img-fluid"
+                 alt="Responsive image"
+                 style="border-radius: 50%; width: 100px">
+            {{ album_details.name }}
+            <small>
+                <a href="{% url 'music:singer_detail' album_details.singer_id %}"
+                   style="text-decoration:none">
+                    {{ album_details.singer }}
+                </a>
+            </small>
+        </h1>
+        <h3>发行时间：{{ album_details.release_date }}</h3>
+        <h3>唱片公司：{{ album_details.record_company }}</h3>
+        <hr class="my-sm-4">
+        <p class="lead">
+            {{ album_details.profile }}
+        </p>
+        <hr class="my-sm-4">
+    {% endif %}
+    <!--歌曲列表居中，样式写得很奇葩。左边距15%，div占65%，就实现了居中-->
+<div class="col" style="width: 65%;text-align: center;margin-left: 15%">
+    <table class="table table-hover" style="margin: 0 auto;">
+    <tr>
+        <td>歌曲</td>
+        <td>歌手</td>
+        <td>专辑</td>
+    </tr>
+        <h3 style="text-align: center">歌曲列表</h3>
+        <br>
+    {% for song in music %}
+        <tr>
+        <!--song 的外键是 album,获取外键的值用下划线，点似乎也可以-->
+        {% if song.album_id == album_details.id %}
+            <td><a href="{% url 'music:music_detail' song.id%}">{{ song.name }}</a></td>
+            <td><a href="{% url 'music:singer_detail' song.singer_id %}">{{ song.singer.name }}</a></td>
+            <td>{{ album_details.name }}</td>
+        {% endif %}
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+    <br>
+    <div class="col" style="width: 65%;text-align: center;margin-left: 15%">
+        <h3>
+            {{ album_details.singer.name }}的其他专辑
+        </h3>
+    <div>
+        {% for album in albums %}
+            <!--其他专辑与当前专辑不同则打印-->
+            {% if album.id != album_details.id %}
+                <img src="{{ album.album_cover.url }}"
+                     alt="..."
+                     style="border-radius: 15%; width: 80px;height: 80px;">
+                    <a href="{% url 'music:album_detail' album.id %}" >
+                        {{ album.name }}
+                    </a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            {% endif %}
+        {% endfor %}
+    </div>
+    </div>
+</div>
+</div>
+    </section>
+{% endblock %}
+
+</body>
+</html>

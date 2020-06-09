@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        {% block title %}
+    OO音乐-最懂你的音乐品味海量优质乐库新歌热歌随心听的音乐平台！
+{% endblock title %}
+        {% block content %}
+            <section class="main_slider_area" style="background: url(../../media/img/banner/banner-bg.png) no-repeat scroll right top">
+            <div class="container">
+                <div class="banner_inner_text">
+                    <h2>乐库</h2>
+                    <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                        <button type="button" class="btn btn-info">
+                            <a href="{% url 'music:music_list' %}?search={{ search }}" style="color: black">最新</a>
+                        </button>
+                        <button type="button" class="btn btn-info">
+                            <a href="{% url 'music:music_list' %}?order=total_views&search={{ search }}" style="color: black">最热</a>
+                        </button>
+                    </div>
+                    <p>最新最热的歌曲都在这里</p>
+                    <br>
+                    <form class="form-inline" >
+                          <label class="sr-only">content</label>
+                          <!--搜索栏-->
+                          <input type="text" style="position: relative ;left: 5px"
+                                 class="form-control mb-2 mr-sm-2"
+                                 name="search"
+                                 placeholder="搜索歌曲、歌手或专辑"
+                                 required
+                          >
+                          <button class="btn btn-outline-primary my-1 my-sm-0" type="submit" style="border-width: 0"><i class='fa fa-search fa-2x'></i></button>
+                      </form>
+                </div>
+            </div>
+        </section>
+       <!--================Banner Area =================-->
+        <section class="service_feature" style="background: url(../../media/img/3d-shap.png) no-repeat scroll left center">
+            <div class="container layui-anim layui-anim-up">
+                <div class="row feature_inner">
+                    {% if music %}
+                    {% for song in music %}
+                        <div class="col-lg-3 col-sm-2">
+                        <div class="feature_item">
+                            <div class="f_icon">
+                                <i class="fa fa-music fa-4x" style="color: lightgreen"></i>
+                            </div>
+                            <h4><a href="{% url 'music:music_detail' song.id %}">
+                                {{ song.name }}
+                            </a><small style="float: right">
+                            <i class="fa fa-headphones fa-lg" style="color: gold"></i>
+                            &nbsp;{{ song.total_views }}
+                        </small></h4>
+                            <p><a href="{% url 'music:singer_detail' song.singer.id %}">{{song.singer}}</a>
+                                <br>
+                                <a href="{% url 'music:album_detail' song.album.id %}">
+                                {{ song.album }}
+                            </a></p>
+                            <form style="display: inline-block"
+                                    id="music_play"
+                                    action="{% url 'music:music_play' song.id %}"
+                                    method="POST">
+                                {% csrf_token %}
+                                <!--播放按钮-->
+                                <button type="submit" style="border-style: none" class="more_btn">
+                                    <i class="fa fa-play fa-2x"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+            </div>
+            </div>
+                    <!-- 页码导航 -->
+    <div class="pagination col" style="float: right; margin-bottom: 50px">
+        <div class="m-auto">
+            <span class="step-links">
+                <!-- 如果有上一页，则显示上翻按钮 -->
+                {% if music.has_previous %}
+                    <a href="?page=1&order={{ order }}&search={{ search }}" class="btn btn-primary">
+                        1
+                    </a>
+                    &nbsp;&nbsp;
+                    <span>...</span>
+                    &nbsp;&nbsp;
+                    <a href="?page={{ music.previous_page_number }}&order={{ order }}&search={{ search }}"
+                       class="btn btn-secondary">
+                        {{ music.previous_page_number }}
+                    </a>
+                {% endif %}
+            &nbsp;&nbsp;
+                <!-- 当前页面 -->
+                <span class="current btn btn-danger btn-lg">
+                    {{ music.number }}
+                </span>
+            &nbsp;&nbsp;
+                <!-- 如果有下一页，则显示下翻按钮 -->
+                {% if music.has_next %}
+                    <a href="?page={{ music.next_page_number }}&order={{ order }}&search={{ search }}"
+                       class="btn btn-secondary">
+                        {{ music.next_page_number }}
+                    </a>
+                    &nbsp;&nbsp;
+                    <span>...</span>
+                    &nbsp;&nbsp;
+                    <a href="?page={{ music.paginator.num_pages }}&order={{ order }}&search={{ search }}"
+                       class="btn btn-primary">
+                        {{ music.paginator.num_pages }}
+                    </a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+        </section>
+
+        <!--================End Banner Area =================-->
+
+
+    {% endblock content %}
+    </body>
+</html>

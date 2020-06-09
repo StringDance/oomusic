@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        {% block title %}
+    OO音乐-最懂你的音乐品味海量优质乐库新歌热歌随心听的音乐平台！
+{% endblock title %}
+        {% block content %}
+                    <section class="main_slider_area" style="background: url(../../media/img/banner/banner-bg.png) no-repeat scroll right top">
+            <div class="container">
+                <div class="banner_inner_text">
+                    <h2>歌曲详情</h2>
+                    <p>看看大伙怎么说</p>
+                </div>
+            </div>
+        </section>
+       <!--================Banner Area =================-->
+        <section class="service_feature">
+<div class="container">
+                <table class="table table-hover">
+        <tr>
+            <td >歌曲名</td>
+            <td>歌手</td>
+            <td>作词人</td>
+            <td>作曲人</td>
+            <td>专辑名</td>
+            <td>发行日期</td>
+            <td>价格</td>
+            <td></td>
+        </tr>
+        <tr class="col-lg-4">
+            <td>
+                <span style="font-size: 2em">{{ music_info.name }}</span>
+                <!--歌曲标签和屏蔽按钮-->
+                    <span>
+                        {% for t in music_info.tag.all %}
+                            <a href="#" class="badge badge-success">
+                                {{ t }}
+                            </a>
+                        {% endfor %}
+                    <!--已登录，显示屏蔽按钮-->
+                    {% if user.is_authenticated %}
+                        <form style="display: inline-block;"
+                              id="shield"
+                              action="{% url 'music:shield' music_info.id %}"
+                              method="post">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="layui-btn layui-btn-sm layui-btn-radius layui-btn-danger"
+                                    style="border-style: none;"
+                            >
+                                屏蔽
+                            </button>
+                        </form>
+                        {% else %}
+                            <button class="layui-btn layui-btn-xs layui-btn-radius layui-btn-disabled" onmouseover="showTips()">屏蔽</button>
+                    {% endif %}
+                    </span>
+
+            </td>
+            <td>
+                <a href="{% url 'music:singer_detail' music_info.singer_id%}">
+                    {{ music_info.singer }}
+                </a>
+            </td>
+            <td>
+                {{ music_info.lyricist }}
+            </td>
+            <td>
+                {{ music_info.composer }}
+            </td>
+            <td>
+                <a href="{% url 'music:album_detail' music_info.album_id%}">
+                    {{ music_info.album }}
+                </a>
+            </td>
+            <td>
+                {{ music_info.release_date }}
+            </td>
+            <td>
+                {{ music_info.price }}
+            </td>
+            <td>
+                <form style="display: inline-block"
+                      id="music_play"
+                      action="{% url 'music:music_play3' music_info.id %}"
+                      method="POST">
+                    {% csrf_token %}
+                    <!--播放按钮-->
+                    <button id="play" name="play" type="submit" style="border-style: none">
+                        <i class="fa fa-play fa-2x"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+    </table>
+    <!-- 评论区 -->
+    <div class="jumbotron">
+        <h1 class="display-4">
+            评论区
+        </h1>
+            <h4>共有{{ comments.object_list.count }}条评论</h4>
+        <br>
+    <div class="row">
+    {% load mptt_tags %}
+        <!--django-mptt提供了遍历树形结构的方式。遍历评论的树形结构,load mptt_tags标签不要忘记-->
+        {% recursetree comments %}
+            <!-- 给 node 取个别名 comment -->
+            {% with comment=node %}
+                <!--若该评论是回复某人的，则偏移-->
+                <div class="{% if comment.reply_to %} offset-1 col-11 {% else %} col-12 {% endif %} ">
+                    <hr>
+                    <p>
+                        <!--评论者头像-->
+                        <img src="{{ comment.user.profile.avatar.url }}"
+                             style="border-radius: 90%;width: 40px;height: 40px; "
+                             class="img-responsive">
+                    <!--评论者名称-->
+                        <strong style="color: #80bdff">
+                            <a href="#" style="text-decoration:none">
+                                {{ comment.user }}
+                            </a>
+                        </strong>
+                        <!--如果该评论是回复某人的评论（而不是评论歌曲）-->
+                        {% if comment.reply_to %}
+                            <!--回复的图标-->
+                            <i class="fa fa-angle-double-right fa-1x"
+                                style="color: red;"
+                        ></i>
+                        <!--被回复人的头像-->
+                        <img src="{{ comment.reply_to.profile.avatar.url }}"
+                             style="border-radius: 90%;width: 40px;height: 40px; "
+                             class="img-responsive">
+                        <!--被回复人的名称-->
+                        <strong style="color: #80bdff">
+                            <a href="#" style="text-decoration:none">
+                                {{ comment.reply_to }}
+                            </a>
+                        </strong>
+                        {% endif %}
+                        &nbsp;&nbsp;&nbsp;
+                        <!--回复、删除评论按钮-->
+                        <i class="fa fa-chevron-left" style="color: deepskyblue"></i>
+                        <!-- 加载 modal 的按钮 -->
+                        {% if user.is_authenticated %}
+                        <a href="#"
+                           onclick="load_modal({{ music_info.id }}, {{ comment.id }})"
+                        >
+                            回复
+                        </a>
+                        {% else %}
+                            <a style="align:right"
+                               href="{% url 'userprofile:login' %}"
+                            >
+                                回复
+                            </a>
+                        {% endif %}
+                        <a href="#"
+                           onclick="comment_delete({{ comment.id }})">
+                            删除评论
+                        </a>
+                        <i class="fa fa-chevron-right" style="color: deepskyblue"></i>
+                    </p>
+                    <!--评论的内容-->
+                    <!--加入|safe防止浏览器将富文本的标记进行转义-->
+                    <div style="font-size: 1em; padding:30px 0 20px 30px">
+                        {{ comment.content|safe }}
+                    </div>
+                    <div>
+                        <span style="color: gray ;">
+                            <!--删除评论-->
+                            <form style="display:none;"
+                              id="comment_delete{{ comment.id }}"
+                              action="{% url 'music:comment_delete' comment.id %}"
+                              method="POST"
+                            >
+                            {% csrf_token %}
+                            <button type="submit">确认</button>
+                            </form>
+                        </span>
+                        <span style="float: right">
+                            {{ comment.created|date:"Y-m-d H:i:s" }}&nbsp;
+                        </span>
+                    </div>
+                    <!-- Modal，Modal是Bootstrap内置的弹窗。
+                     详见 https://getbootstrap.com/docs/4.1/components/modal/ -->
+                    <div class="modal fade"
+                         id="comment_{{ comment.id }}"
+                         tabindex="-1"
+                         role="dialog"
+                         aria-labelledby="CommentModalCenter"
+                         aria-hidden="true"
+                    >
+                    <div class="modal-dialog modal-dialog-centered modal-lg"
+                         role="document"
+                    >
+                        <div class="modal-content" style="height: 480px">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalCenterTitle">回复 {{ comment.user }}：</h5>
+                            </div>
+                            <div class="modal-body" id="modal_body_{{ comment.id }}"></div>
+                        </div>
+                    </div>
+                </div>
+                {% if not comment.is_leaf_node %}
+                    <div class="children">
+                        {{ children }}
+                    </div>
+                {% endif %}
+            </div>
+                {% endwith %}
+            {% endrecursetree %}
+    </div>
+    </div>
+
+
+    <!--页码导航-->
+    <div class="pagination row" >
+    <div class="m-auto">
+        <span class="step-links">
+            <!-- 如果不是第一页，则显示上翻按钮 -->
+            {% if comments.has_previous %}
+                <a href="?page=1" class="btn btn-success">
+                    &laquo; 1
+                </a>
+                <span>...</span>
+                <a href="?page={{ comments.previous_page_number }}"
+                   class="btn btn-secondary"
+                >
+                    {{ comments.previous_page_number }}
+                </a>
+            {% endif %}
+
+            <!-- 当前页面 -->
+                <span class="current btn btn-danger btn-lg">
+                    {{ comments.number }}
+                </span>
+
+            <!-- 如果不是最末页，则显示下翻按钮 -->
+            {% if comments.has_next %}
+                <a href="?page={{ comments.next_page_number }}"
+                   class="btn btn-secondary"
+                >
+                    {{ comments.next_page_number }}
+                </a>
+                <span>...</span>
+                <a href="?page={{ comments.paginator.num_pages }}"
+                   class="btn btn-success"
+                >
+                    {{ comments.paginator.num_pages }} &raquo;
+                </a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+        <!-- 发表评论 -->
+    <hr>
+    {% if user.is_authenticated %}
+        <div>
+            <form
+                action="{% url 'comment:post_comment' music_info.id %}"
+                method="POST"
+            >
+            {% csrf_token %}
+                <div class="form-group">
+                    <label for="content">
+                        <strong>
+                            发表评论：
+                        </strong>
+                    </label>
+                    <div>
+                        {{ comment_form.media }}
+                        {{ comment_form.content }}
+                    </div>
+                </div>
+                <!-- 提交按钮 -->
+                <button type="submit" class="btn btn-primary ">发表</button>
+                <script>
+                    CKEDITOR.editorConfig = function( config ) {
+                        config.language = 'fr';
+                        config.uiColor = '#AADC6E';
+                    };
+                </script>
+            </form>
+
+        </div>
+        <br>
+    {% else %}
+        <br>
+        <h5 class="row justify-content-center">
+            请<a href="{% url 'userprofile:login' %}" style="color: red">登录</a>后回复
+        </h5>
+        <br>
+    {% endif %}
+    <br>
+    <br>
+</div>
+{% endblock content%}
+<!--Ckeditor编辑器本身有一个inline-block的样式，阻碍了自适应效果
+用jQuery找到页面中class='django-ckeditor-widget'的容器，然后删除style属性并自行修改。
+这里用 block script 块是为了在渲染页面时jQuery语句出现在载入jQuery的语句后（前提是在base.html加入block script）才能使下面jQuery语句生效
+-->
+
+            </div>
+        </section>
+    </body>
+{% block script %}
+<script>
+    //移除ckeditor原有的样式
+    $(".django-ckeditor-widget").removeAttr('style');
+
+    function showTips() {
+        layer.msg('您需要先登录！');
+    }
+    function comment_delete(comment_id) {
+    layer.open({
+        title: "确认删除",
+        content: "删除后不可恢复，您确认要删除这篇评论吗？",
+        yes: function(index, layero) {
+            let form_btn = 'form#comment_delete' + comment_id + ' button';
+            $(form_btn).click();
+            layer.close(index);
+        }
+    });
+
+}
+</script>
+<script>
+    // 加载 modal.
+    // 点击回复按钮时唤醒了load_modal()函数，并将文章id、父级评论id传递进去
+    function load_modal(music_id, comment_id) {
+        let modal_body = '#modal_body_' + comment_id;
+        let modal_id = '#comment_' + comment_id;
+        // 加载编辑器
+        if ($(modal_body).children().length === 0) {
+            let content = '<iframe src="/comment/post-comment/' +
+                music_id +
+                '/' +
+                comment_id +
+                '"' +
+                ' frameborder="0" style="width: 100%; height: 100%;" id="iframe_' +
+                comment_id +
+                '"></iframe>';
+            <!--找到对应Modal的容器，并将一个iframe容器动态添加进去（避免潜在的性能问题）-->
+            $(modal_body).append(content);
+        };
+        <!--找到对应的Modal，并将其唤醒-->
+        $(modal_id).modal('show');
+    }
+</script>
+{% endblock script %}
+</html>

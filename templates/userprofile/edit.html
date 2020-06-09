@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+<html lang="en">
+    <body >
+{% block title %} 用户信息 {% endblock title %}
+{% block content %}
+
+    <br><br><br><br><br><br>
+<div class="container layui-anim layui-anim-up" style="margin-bottom: 60px;background: url(/media/img/3d-shap.png)no-repeat scroll right top">
+    <div class="row">
+        <div class="col-12">
+            <br>
+            <fieldset disabled>
+                <div class="col-md-3">
+                    <h3 for="disabledTextInput"><i class="fa fa-user-circle-o"></i> 用户名</h3>
+                    <input class="form-control" id="disabledTextInput" placeholder="{{ user.username }}">
+                    <small id="usernameHelpBlock" class="form-text text-muted">
+                        用户名不支持更改
+                    </small>
+                </div>
+            </fieldset>
+
+            <br>
+            {% if profile.avatar %}
+                <h3 class="col-md-4">
+                    <i class="fa fa-file-image-o"></i>
+                    头像
+                </h3>
+                <img src="{{ profile.avatar.url }}" style="max-width: 20%;border-radius: 15%;" class="col-md-4">
+
+                {% endif %}
+            <br>
+            <br>
+            <!--设置enctype="multipart/form-data"属性，才能够正确上传图片等文件。-->
+            <form method="post" action="." enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- avatar -->
+                <div class="form-group col-md-4">
+                    <h3 for="avatar">
+                        <i class="fa fa-file-image-o"></i>
+                        上传头像
+                    </h3>
+                    <small id="usernameHelpBlock" class="form-text text-muted">
+                        图片比例为1：1显示效果更佳
+                    </small>
+                    <input type="file" class="form-control-file" name="avatar" id="avatar">
+                </div>
+                <!-- phone -->
+                <div class="form-group col-md-2">
+                    <h3 for="phone">
+                        <i class="fa fa-phone"></i>
+                        电话
+                    </h3>
+                    <input type="text" class="form-control" id="phone" name="phone" value="{{ profile.phone }}">
+                </div>
+                <!-- bio -->
+                <div class="form-group col-md-8">
+                    <h3 for="bio">
+                        <i class="fa fa-file-text"></i>
+                        简介
+                    </h3>
+                    <textarea type="text" class="form-control" id="bio" name="bio" rows="12">{{ profile.bio }}</textarea>
+                </div>
+                <!-- 提交按钮 -->
+                <button type="submit" class="btn btn-primary">提交更改</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+    </body>
+</html>

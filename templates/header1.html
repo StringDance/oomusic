@@ -1,0 +1,96 @@
+{% load static %}
+<header class="main_menu_area" style="background-color: lightseagreen">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="#"><img src="/media/img/oomusiclogo.png" alt="gggoo"></a>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active"><a class="nav-link" href="{% url 'music:index' %}">主页</a></li>
+                        <li class="nav-item"><a class="navbar" href="{% url 'music:music_list' %}">乐库</a></li>
+                        {% if user.is_authenticated %}
+                  <!-- 如果用户已经登录，则显示用户名下拉框 -->
+                  <li class="nav-item dropdown">
+                      <a
+                              class="nav-link dropdown-toggle"
+                              href="#"
+                              id="navbarDropdown"
+                              role="button"
+                              data-toggle="dropdown"
+                              aria-haspopup="true"
+                              aria-expanded="false"
+                      >
+                          <img
+                                  src="{{ user.profile.avatar.url }}"
+                                  style="border-radius: 90%;width: 40px;height: 40px; "
+                                  class="img-responsive"
+                                alt="头像"
+                          >
+                          {{ user.username }}
+                      </a>
+
+                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                          <a class="dropdown-item" href='{% url "userprofile:edit" user.id %}'>
+                              <i class="fa fa-user-o"></i>
+                              个人信息
+                          </a>
+                          <a class="dropdown-item" href='{% url "userprofile:preference" user.id%}'>
+                              <i class="fa fa-heart-o"></i>
+                              偏好
+                          </a>
+                          <a class="dropdown-item" href="{% url 'music:record_detail' user.id%}">
+                              <i class="fa fa-file-text-o"></i>
+                              播放记录
+                          </a>
+                          <a class="dropdown-item" href="{% url 'music:music_taste' user.id%}">
+                              <i class="fa fa-file-text-o"></i>
+                              听歌品味
+                          </a>
+                          <a class="dropdown-item" href='{% url 'userprofile:logout' %}'>
+                              <i class="fa fa-plane"></i>
+                              登出
+                          </a>
+                          <a class="dropdown-item" href="#" onclick="user_delete()">
+                              <i class="fa fa-user-times"></i>
+                              注销
+                          </a>
+                      </div>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="{% url 'music:daily_recommendation' user.id%}">今日推荐</a>
+                  </li>
+                  <!-- 如果用户未登录，则显示 “登录” -->
+              {% else %}
+                  <li class="nav-item">
+                        <a class="nav-link" href="{% url 'account_login' %}">登录</a>
+                  </li>
+                  <li>
+                      <a class="nav-link" href="{% url 'account_signup' %}">注册</a>
+                  </li>
+              {% endif %}
+                    </ul>
+                </div>
+            </nav>
+{% if user.is_authenticated %}
+<form
+    style="display:none;"
+    id="user_delete"
+    action="{% url 'userprofile:delete' user.id %}"
+    method="POST"
+>
+{% csrf_token %}
+    <button type="submit">发送</button>
+</form>
+    <script>
+        function user_delete() {
+            layer.open({
+                title: "确认删除",
+                content: "确认删除用户吗？",
+                yes: function(index, layero) {
+                    $('form#user_delete button').click();
+                    layer.close(index);
+                },
+            })
+        }
+    </script>
+{% endif %}
+        </header>
+        <!--================End Header Menu Area =================-->
