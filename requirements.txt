@@ -20,7 +20,7 @@ legacy==0.1.6
 MarkupSafe==1.1.1
 matplotlib==3.2.1
 mpmath==1.1.0
-numpy==1.18.4
+numpy==1.22.0
 oauthlib==3.1.0
 pandas==1.0.4
 Pillow==7.1.2
